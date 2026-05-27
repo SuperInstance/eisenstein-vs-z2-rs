@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 target/
+=======
+/target
+>>>>>>> 28dd04f (Initial Rust port: Eisenstein vs Z² lattice benchmark)
