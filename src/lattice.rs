@@ -71,7 +71,9 @@ pub struct LatticePoint {
 }
 
 impl LatticePoint {
-    pub fn new(x: f64, y: f64) -> Self { Self { x, y } }
+    pub fn new(x: f64, y: f64) -> Self {
+        Self { x, y }
+    }
 
     pub fn distance_to(&self, other: &LatticePoint) -> f64 {
         let dx = self.x - other.x;

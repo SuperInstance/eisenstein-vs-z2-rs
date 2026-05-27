@@ -1,9 +1,9 @@
 //! eisenstein-vs-z2 — Eisenstein integer lattice vs Z² lattice benchmarking.
 
-pub mod lattice;
 pub mod benchmark;
 pub mod convergence;
+pub mod lattice;
 
-pub use lattice::{EisensteinInt, LatticePoint, SnapResult};
-pub use benchmark::{Benchmark, TrialResult, AggregatedResult};
+pub use benchmark::{AggregatedResult, Benchmark, TrialResult};
 pub use convergence::ConvergenceAnalysis;
+pub use lattice::{EisensteinInt, LatticePoint, SnapResult};

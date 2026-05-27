@@ -50,13 +50,17 @@ impl ConvergenceAnalysis {
 
     /// Check if Eisenstein consistently outperforms Z².
     pub fn eisenstein_wins_on_error(&self) -> bool {
-        self.eisenstein.iter().zip(self.z2.iter())
+        self.eisenstein
+            .iter()
+            .zip(self.z2.iter())
             .all(|(e, z)| e.mean_error < z.mean_error)
     }
 
     /// Get advantage percentage at each sample size.
     pub fn advantage_percentages(&self) -> Vec<(usize, f64)> {
-        self.eisenstein.iter().zip(self.z2.iter())
+        self.eisenstein
+            .iter()
+            .zip(self.z2.iter())
             .map(|(e, z)| {
                 let adv = (z.mean_error - e.mean_error) / z.mean_error * 100.0;
                 (e.n, adv)
@@ -66,7 +70,9 @@ impl ConvergenceAnalysis {
 
     /// Check convergence of mean error (should stabilize).
     pub fn error_converged(&self, tolerance: f64) -> bool {
-        if self.eisenstein.len() < 2 { return false; }
+        if self.eisenstein.len() < 2 {
+            return false;
+        }
         let last = &self.eisenstein[self.eisenstein.len() - 1];
         let prev = &self.eisenstein[self.eisenstein.len() - 2];
         (last.mean_error - prev.mean_error).abs() < tolerance
@@ -75,10 +81,16 @@ impl ConvergenceAnalysis {
     /// Summary string.
     pub fn summary(&self) -> String {
         let mut lines = vec!["Convergence Analysis".to_string()];
-        lines.push(format!("{:>10} {:>12} {:>12} {:>10}", "N", "Eisenstein", "Z²", "Advantage"));
+        lines.push(format!(
+            "{:>10} {:>12} {:>12} {:>10}",
+            "N", "Eisenstein", "Z²", "Advantage"
+        ));
         for (e, z) in self.eisenstein.iter().zip(self.z2.iter()) {
             let adv = (z.mean_error - e.mean_error) / z.mean_error * 100.0;
-            lines.push(format!("{:>10} {:>12.6} {:>12.6} {:>9.2}%", e.n, e.mean_error, z.mean_error, adv));
+            lines.push(format!(
+                "{:>10} {:>12.6} {:>12.6} {:>9.2}%",
+                e.n, e.mean_error, z.mean_error, adv
+            ));
         }
         lines.join("\n")
     }

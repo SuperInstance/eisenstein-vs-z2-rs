@@ -69,7 +69,12 @@ impl SimpleRng {
 }
 
 /// Run a single trial.
-pub fn run_trial(n: usize, trial_idx: usize, lattice_type: &str, rng: &mut SimpleRng) -> TrialResult {
+pub fn run_trial(
+    n: usize,
+    trial_idx: usize,
+    lattice_type: &str,
+    rng: &mut SimpleRng,
+) -> TrialResult {
     // Generate random points in [-10, 10]²
     let points: Vec<(f64, f64)> = (0..n)
         .map(|_| (rng.uniform(-10.0, 10.0), rng.uniform(-10.0, 10.0)))
@@ -77,18 +82,25 @@ pub fn run_trial(n: usize, trial_idx: usize, lattice_type: &str, rng: &mut Simpl
 
     let start = Instant::now();
 
-    let errors: Vec<f64> = points.iter().map(|&(x, y)| {
-        match lattice_type {
+    let errors: Vec<f64> = points
+        .iter()
+        .map(|&(x, y)| match lattice_type {
             "eisenstein" => snap_eisenstein(x, y).error,
             _ => snap_z2(x, y).error,
-        }
-    }).collect();
+        })
+        .collect();
 
     let mut unique_coords: HashSet<(i64, i64)> = HashSet::new();
     for &(x, y) in &points {
         match lattice_type {
-            "eisenstein" => { let r = snap_eisenstein(x, y); unique_coords.insert(r.lattice_coords); }
-            _ => { let r = snap_z2(x, y); unique_coords.insert(r.lattice_coords); }
+            "eisenstein" => {
+                let r = snap_eisenstein(x, y);
+                unique_coords.insert(r.lattice_coords);
+            }
+            _ => {
+                let r = snap_z2(x, y);
+                unique_coords.insert(r.lattice_coords);
+            }
         }
     }
 
@@ -105,8 +117,14 @@ pub fn run_trial(n: usize, trial_idx: usize, lattice_type: &str, rng: &mut Simpl
 
     let p95_idx = (errors.len() as f64 * 0.95) as usize;
     let p99_idx = (errors.len() as f64 * 0.99) as usize;
-    let p95 = sorted_errors.get(p95_idx.min(&sorted_errors.len() - 1)).copied().unwrap_or(0.0);
-    let p99 = sorted_errors.get(p99_idx.min(&sorted_errors.len() - 1)).copied().unwrap_or(0.0);
+    let p95 = sorted_errors
+        .get(p95_idx.min(&sorted_errors.len() - 1))
+        .copied()
+        .unwrap_or(0.0);
+    let p99 = sorted_errors
+        .get(p99_idx.min(&sorted_errors.len() - 1))
+        .copied()
+        .unwrap_or(0.0);
 
     let recovery_001 = errors.iter().filter(|&&e| e <= 0.01).count() as f64 / errors.len() as f64;
     let recovery_01 = errors.iter().filter(|&&e| e <= 0.1).count() as f64 / errors.len() as f64;
@@ -137,9 +155,8 @@ pub fn aggregate(trials: &[TrialResult]) -> AggregatedResult {
     let lattice = trials[0].lattice.clone();
     let count = trials.len() as f64;
 
-    let mean_of = |f: &dyn Fn(&TrialResult) -> f64| -> f64 {
-        trials.iter().map(f).sum::<f64>() / count
-    };
+    let mean_of =
+        |f: &dyn Fn(&TrialResult) -> f64| -> f64 { trials.iter().map(f).sum::<f64>() / count };
 
     let std_of = |f: &dyn Fn(&TrialResult) -> f64, mean: f64| -> f64 {
         let var = trials.iter().map(|t| (f(t) - mean).powi(2)).sum::<f64>() / count;
@@ -186,8 +203,14 @@ impl Benchmark {
         }
     }
 
-    pub fn with_ns(mut self, ns: Vec<usize>) -> Self { self.ns = ns; self }
-    pub fn with_trials(mut self, n: usize) -> Self { self.num_trials = n; self }
+    pub fn with_ns(mut self, ns: Vec<usize>) -> Self {
+        self.ns = ns;
+        self
+    }
+    pub fn with_trials(mut self, n: usize) -> Self {
+        self.num_trials = n;
+        self
+    }
 
     pub fn run(&self) -> (Vec<TrialResult>, Vec<AggregatedResult>) {
         let mut rng = SimpleRng::new(42);
@@ -253,13 +276,15 @@ mod tests {
         let bench = Benchmark::new().with_ns(vec![100]).with_trials(2);
         let (trials, agg) = bench.run();
         assert_eq!(trials.len(), 4); // 1 n × 2 lattices × 2 trials
-        assert_eq!(agg.len(), 2);    // 1 n × 2 lattices
+        assert_eq!(agg.len(), 2); // 1 n × 2 lattices
     }
 
     #[test]
     fn test_aggregate() {
         let mut rng = SimpleRng::new(42);
-        let trials: Vec<TrialResult> = (0..3).map(|i| run_trial(100, i, "eisenstein", &mut rng)).collect();
+        let trials: Vec<TrialResult> = (0..3)
+            .map(|i| run_trial(100, i, "eisenstein", &mut rng))
+            .collect();
         let agg = aggregate(&trials);
         assert_eq!(agg.n, 100);
         assert!(agg.mean_error_mean > 0.0);
