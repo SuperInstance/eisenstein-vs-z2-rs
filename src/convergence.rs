@@ -1,6 +1,6 @@
 //! Convergence analysis — how metrics scale with sample size.
 
-use crate::benchmark::{run_trial, SimpleRng, TrialResult};
+use crate::benchmark::{run_trial, SimpleRng};
 
 /// Convergence analysis result for a single lattice type.
 #[derive(Debug, Clone)]
