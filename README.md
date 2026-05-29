@@ -1,75 +1,75 @@
 # eisenstein-vs-z2-rs
 
-<<<<<<< HEAD
-Rust port of [eisenstein-vs-z2](https://github.com/SuperInstance/eisenstein-vs-z2) — rigorous comparison of hexagonal (Eisenstein) vs square lattice snapping.
+Rust benchmark comparing Eisenstein (hexagonal A₂) vs square (Z²) lattice for constraint quantization — snap error, packing density, convergence rate, and spectral properties.
 
-## Features
+## What This Gives You
 
-- **`EisensteinInt`** — Eisenstein integer arithmetic (add, multiply, conjugate, norm)
-- **Lattice snapping** — Snap 2D points to nearest Eisenstein or Z² lattice point
-- **`Benchmark`** — Full benchmark suite with configurable sample sizes and trials
-- **`ConvergenceAnalysis`** — Verify Eisenstein advantage scales across sample sizes
-- **Theoretical constants** — Covering radii, Voronoi cell areas
+- **Dual-lattice snap** — snap points to both Eisenstein A₂ and Z² with error measurement
+- **Statistical benchmarks** — RMS error, max error, and error distribution across thousands of points
+- **Convergence analysis** — how quickly each lattice converges under constraint dynamics
+- **Packing comparison** — lattice packing density and covering radius
+- **20 tests** — verified snap accuracy and metric correctness
 
-## Why Eisenstein?
-
-The hexagonal lattice (Eisenstein integers) is provably the densest packing in 2D (Thue's theorem). This means:
-- **Lower snap error**: Every point in ℝ² is closer to its nearest Eisenstein lattice point
-- **Better packing**: Fewer collisions when snapping to integer coordinates
-- **~13-17% advantage** across all metrics
-=======
-Rust port of [eisenstein-vs-z2](https://github.com/SuperInstance/eisenstein-vs-z2) — benchmarking hexagonal vs square lattice snapping.
-
-## Why Eisenstein > Z²?
-
-Eisenstein integers ℤ[ω] (hexagonal lattice) are the densest packing in 2D. This means:
-- **Smaller covering radius**: 1/√3 ≈ 0.577 vs 1/√2 ≈ 0.707
-- **Better snap accuracy**: mean error ~13% lower
-- **Better packing density**: more unique lattice points per random sample
->>>>>>> 28dd04f (Initial Rust port: Eisenstein vs Z² lattice benchmark)
-
-## Usage
+## Quick Start
 
 ```rust
-<<<<<<< HEAD
-use eisenstein_vs_z2::{EisensteinInt, snap_eisenstein, snap_z2, Benchmark, ConvergenceAnalysis};
+use eisenstein_vs_z2::{LatticePoint, Benchmark, EisensteinInt};
 
-// Eisenstein integer arithmetic
-let e = EisensteinInt::new(3, 5);
-println!("Norm: {}", e.norm()); // a² - ab + b²
-println!("Cartesian: {:?}", e.to_cartesian());
+// Snap to Eisenstein lattice
+let e = EisensteinInt::snap(0.7, 0.3);
+println!("Eisenstein: ({}, {}), norm={}", e.a, e.b, e.norm());
 
-// Compare snap errors
-let e_result = snap_eisenstein(1.7, 2.3);
-let z_result = snap_z2(1.7, 2.3);
-println!("Eisenstein error: {:.4}", e_result.error);
-println!("Z² error: {:.4}", z_result.error);
+// Snap to Z²
+let z = LatticePoint::snap_z2(0.7, 0.3);
+println!("Z²: ({}, {})", z.x, z.y);
 
-// Full benchmark
-let bench = Benchmark::new();
-let (trials, aggregated) = bench.run();
+// Run comparison benchmark
+let bench = Benchmark::new(10000);
+let result = bench.run();
+println!("Eisenstein RMS error: {:.4}", result.eisenstein_rms);
+println!("Z² RMS error: {:.4}", result.z2_rms);
+println!("Eisenstein wins: {:.1}%", result.eisenstein_wins_pct());
+```
 
-// Convergence analysis
-let ca = ConvergenceAnalysis::run(&[100, 1000, 10000]);
-assert!(ca.eisenstein_wins_on_error());
-println!("{}", ca.summary());
-=======
-use eisenstein_vs_z2::{snap_eisenstein, snap_z2, run_eisenstein_trial, run_z2_trial};
+## API Reference
 
-// Snap a point to nearest lattice point
-let e = snap_eisenstein(1.4, 2.6);  // EisensteinInt { a, b }
-let z = snap_z2(1.4, 2.6);          // Z2Int { x, y }
+| Type | Description |
+|---|---|
+| `EisensteinInt` | Eisenstein integer with snap and norm |
+| `LatticePoint` | Z² lattice point with snap |
+| `Benchmark` | Statistical comparison runner |
+| `TrialResult` | Single comparison result |
+| `AggregatedResult` | Summary statistics |
+| `ConvergenceAnalysis` | Convergence rate comparison |
 
-// Benchmark 10k random points
-let points: Vec<(f64, f64)> = /* ... */;
-let e_result = run_eisenstein_trial(&points);
-let z_result = run_z2_trial(&points);
-assert!(e_result.mean_error < z_result.mean_error);
->>>>>>> 28dd04f (Initial Rust port: Eisenstein vs Z² lattice benchmark)
+## Key Results
+
+The Eisenstein A₂ lattice outperforms Z² for constraint quantization because:
+- **Closer packing** — hexagonal lattice has higher packing density (π/2√3 vs π/4)
+- **Smaller covering radius** — ρ = 1/√3 ≈ 0.577 vs √2/2 ≈ 0.707
+- **6-fold symmetry** — more rotational symmetry preserves more structure
+
+## How It Fits
+
+The **benchmark suite** for lattice comparison:
+
+- [eisenstein-vs-z2-c](https://github.com/SuperInstance/eisenstein-vs-z2-c) — C port
+- [eisenstein-triples](https://github.com/SuperInstance/eisenstein-triples) — Eisenstein triple number theory
+- [eisenstein-embed](https://github.com/SuperInstance/eisenstein-embed) — Eisenstein embeddings
+- [constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core) — uses A₂ lattice
+
+## Testing
+
+```bash
+cargo test  # 20 tests
+```
+
+## Installation
+
+```bash
+cargo add eisenstein-vs-z2
 ```
 
 ## License
 
 MIT
-
-Part of the [SuperInstance OpenConstruct](https://github.com/SuperInstance/OpenConstruct) ecosystem.
