@@ -71,3 +71,5 @@ assert!(e_result.mean_error < z_result.mean_error);
 ## License
 
 MIT
+
+Part of the [SuperInstance OpenConstruct](https://github.com/SuperInstance/OpenConstruct) ecosystem.
