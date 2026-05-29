@@ -1,75 +1,74 @@
 # eisenstein-vs-z2-rs
 
-Rust benchmark comparing Eisenstein (hexagonal A₂) vs square (Z²) lattice for constraint quantization — snap error, packing density, convergence rate, and spectral properties.
+Rust port of [eisenstein-vs-z2](https://github.com/SuperInstance/eisenstein-vs-z2) — rigorous comparison of hexagonal (Eisenstein) vs square lattice snapping.
 
 ## What This Gives You
 
-- **Dual-lattice snap** — snap points to both Eisenstein A₂ and Z² with error measurement
-- **Statistical benchmarks** — RMS error, max error, and error distribution across thousands of points
-- **Convergence analysis** — how quickly each lattice converges under constraint dynamics
-- **Packing comparison** — lattice packing density and covering radius
-- **20 tests** — verified snap accuracy and metric correctness
+- **`EisensteinInt`** — Eisenstein integer arithmetic (add, multiply, conjugate, norm)
+- **Lattice snapping** — Snap 2D points to nearest Eisenstein or Z² lattice point
+- **`Benchmark`** — Full benchmark suite with configurable sample sizes and trials
+- **`ConvergenceAnalysis`** — Verify Eisenstein advantage scales across sample sizes
+- **Theoretical constants** — Covering radii, Voronoi cell areas
+
+## Why Eisenstein?
+
+The hexagonal lattice (Eisenstein integers) is provably the densest packing in 2D (Thue's theorem). This means:
+- **Lower snap error**: Every point in ℝ² is closer to its nearest Eisenstein lattice point
+- **Better packing**: Fewer collisions when snapping to integer coordinates
+- **~13-17% advantage** across all metrics
 
 ## Quick Start
 
 ```rust
-use eisenstein_vs_z2::{LatticePoint, Benchmark, EisensteinInt};
+use eisenstein_vs_z2::{EisensteinInt, snap_eisenstein, snap_z2, Benchmark, ConvergenceAnalysis};
 
-// Snap to Eisenstein lattice
-let e = EisensteinInt::snap(0.7, 0.3);
-println!("Eisenstein: ({}, {}), norm={}", e.a, e.b, e.norm());
+// Eisenstein integer arithmetic
+let e = EisensteinInt::new(3, 5);
+println!("Norm: {}", e.norm()); // a² - ab + b²
+println!("Cartesian: {:?}", e.to_cartesian());
 
-// Snap to Z²
-let z = LatticePoint::snap_z2(0.7, 0.3);
-println!("Z²: ({}, {})", z.x, z.y);
+// Compare snap errors
+let e_result = snap_eisenstein(1.7, 2.3);
+let z_result = snap_z2(1.7, 2.3);
+println!("Eisenstein error: {:.4}", e_result.error);
+println!("Z² error: {:.4}", z_result.error);
 
-// Run comparison benchmark
-let bench = Benchmark::new(10000);
-let result = bench.run();
-println!("Eisenstein RMS error: {:.4}", result.eisenstein_rms);
-println!("Z² RMS error: {:.4}", result.z2_rms);
-println!("Eisenstein wins: {:.1}%", result.eisenstein_wins_pct());
+// Full benchmark
+let bench = Benchmark::new();
+let (trials, aggregated) = bench.run();
+
+// Convergence analysis
+let ca = ConvergenceAnalysis::run(&[100, 1000, 10000]);
+assert!(ca.eisenstein_wins_on_error());
+println!("{}", ca.summary());
 ```
-
-## API Reference
-
-| Type | Description |
-|---|---|
-| `EisensteinInt` | Eisenstein integer with snap and norm |
-| `LatticePoint` | Z² lattice point with snap |
-| `Benchmark` | Statistical comparison runner |
-| `TrialResult` | Single comparison result |
-| `AggregatedResult` | Summary statistics |
-| `ConvergenceAnalysis` | Convergence rate comparison |
-
-## Key Results
-
-The Eisenstein A₂ lattice outperforms Z² for constraint quantization because:
-- **Closer packing** — hexagonal lattice has higher packing density (π/2√3 vs π/4)
-- **Smaller covering radius** — ρ = 1/√3 ≈ 0.577 vs √2/2 ≈ 0.707
-- **6-fold symmetry** — more rotational symmetry preserves more structure
 
 ## How It Fits
 
-The **benchmark suite** for lattice comparison:
+Part of the [SuperInstance](https://github.com/SuperInstance) Eisenstein lattice ecosystem:
 
-- [eisenstein-vs-z2-c](https://github.com/SuperInstance/eisenstein-vs-z2-c) — C port
-- [eisenstein-triples](https://github.com/SuperInstance/eisenstein-triples) — Eisenstein triple number theory
-- [eisenstein-embed](https://github.com/SuperInstance/eisenstein-embed) — Eisenstein embeddings
-- [constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core) — uses A₂ lattice
+- **Original**: [eisenstein-vs-z2](https://github.com/SuperInstance/eisenstein-vs-z2) — Python reference
+- **This repo**: Rust port for production use
+- **C port**: [eisenstein-vs-z2-c](https://github.com/SuperInstance/eisenstein-vs-z2-c) — Embedded/bare-metal
+- **Embeddings**: [eisenstein-embed](https://github.com/SuperInstance/eisenstein-embed) — Higher-dimensional embeddings
+- **Triples**: [eisenstein-triples](https://github.com/SuperInstance/eisenstein-triples) — Eisenstein integer triples
 
 ## Testing
 
 ```bash
-cargo test  # 20 tests
+cargo test
+cargo bench
 ```
 
 ## Installation
 
-```bash
-cargo add eisenstein-vs-z2
+```toml
+[dependencies]
+eisenstein-vs-z2 = { git = "https://github.com/SuperInstance/eisenstein-vs-z2-rs" }
 ```
 
 ## License
 
 MIT
+
+Part of the [SuperInstance OpenConstruct](https://github.com/SuperInstance/OpenConstruct) ecosystem.
