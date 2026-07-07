@@ -73,7 +73,11 @@ fn test_eisenstein_to_cartesian_roundtrip() {
             let z = EisensteinInt::new(a, b);
             let (x, y) = z.to_cartesian();
             let result = lattice::snap_eisenstein(x, y);
-            assert!(result.error < 1e-6, "roundtrip failed for ({a},{b}): error={}", result.error);
+            assert!(
+                result.error < 1e-6,
+                "roundtrip failed for ({a},{b}): error={}",
+                result.error
+            );
         }
     }
 }
